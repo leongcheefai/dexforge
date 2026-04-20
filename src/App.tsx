@@ -1,4 +1,5 @@
 import { PreviewCanvas } from '@/features/preview/PreviewCanvas'
+import { CardSettingsPanel } from '@/features/customization/CardSettingsPanel'
 
 export default function App() {
   return (
@@ -11,7 +12,7 @@ export default function App() {
       </header>
       <div className="flex" style={{ height: 'calc(100vh - 3.5rem)' }}>
         <aside className="w-80 border-r overflow-y-auto p-4 shrink-0">
-          {/* CardSettingsPanel mounts here in Task 5 */}
+          <CardSettingsPanel />
         </aside>
         <main className="flex-1 overflow-y-auto">
           <PreviewCanvas />
