@@ -156,29 +156,25 @@ export function CardSettingsPanel() {
         </Section>
 
         <Section>
-          <SectionLabel>Border Style</SectionLabel>
-          <div className="grid grid-cols-4 gap-1.5">
-            {BORDER_STYLES.map(({ value, label }) => (
-              <button
-                key={value}
-                onClick={() => store.setBorderStyle(value)}
-                className={`rounded-md py-1.5 text-[11px] font-medium tracking-wide transition-all duration-150 ${
-                  store.borderStyle === value
-                    ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
-                    : 'bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-secondary'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </Section>
-
-        <Section>
-          <SectionLabel>Colors</SectionLabel>
+          <SectionLabel>Border</SectionLabel>
           <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-4 gap-1.5">
+              {BORDER_STYLES.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => store.setBorderStyle(value)}
+                  className={`rounded-md py-1.5 text-[11px] font-medium tracking-wide transition-all duration-150 ${
+                    store.borderStyle === value
+                      ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
+                      : 'bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-foreground/70">Border</span>
+              <span className="text-sm text-foreground/70">Color</span>
               <label className="cursor-pointer group relative">
                 <input
                   type="color"
@@ -192,21 +188,25 @@ export function CardSettingsPanel() {
                 />
               </label>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-foreground/70">Background</span>
-              <label className="cursor-pointer group relative">
-                <input
-                  type="color"
-                  value={bgColorDraft}
-                  onChange={(e) => setBgColorDraft(e.target.value)}
-                  className="sr-only"
-                />
-                <div
-                  className="h-8 w-8 rounded-md border-2 border-border/60 ring-offset-background group-focus-within:ring-2 group-focus-within:ring-ring group-focus-within:ring-offset-2 transition-all hover:border-primary/50"
-                  style={{ backgroundColor: bgColorDraft }}
-                />
-              </label>
-            </div>
+          </div>
+        </Section>
+
+        <Section>
+          <SectionLabel>Background</SectionLabel>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-foreground/70">Color</span>
+            <label className="cursor-pointer group relative">
+              <input
+                type="color"
+                value={bgColorDraft}
+                onChange={(e) => setBgColorDraft(e.target.value)}
+                className="sr-only"
+              />
+              <div
+                className="h-8 w-8 rounded-md border-2 border-border/60 ring-offset-background group-focus-within:ring-2 group-focus-within:ring-ring group-focus-within:ring-offset-2 transition-all hover:border-primary/50"
+                style={{ backgroundColor: bgColorDraft }}
+              />
+            </label>
           </div>
         </Section>
 

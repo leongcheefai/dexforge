@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useCardSettingsStore, spriteUrl } from '@/features/customization/store'
 import { useSelectionStore } from '@/features/selection/store'
 import { typeColor } from '@/lib/pokemon-types'
+import { loadSprite, getCachedBlobUrl } from '@/lib/sprite-cache'
 
 const pokemonCache = new Map<number, { name: string; types: string[] }>()
 
@@ -52,12 +53,36 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
   const { fromId } = useSelectionStore()
   const id = pokemonId ?? fromId
 
-  const [loaded, setLoaded] = useState(false)
+  const rawUrl = spriteUrl(id, imageStyle)
+  const [blobUrl, setBlobUrl] = useState<string | null>(() => rawUrl ? (getCachedBlobUrl(rawUrl) ?? null) : null)
+  const [loaded, setLoaded] = useState(() => rawUrl ? !!getCachedBlobUrl(rawUrl) : false)
   const [name, setName] = useState<string | null>(() => pokemonCache.get(id)?.name ?? null)
   const [types, setTypes] = useState<string[]>(() => pokemonCache.get(id)?.types ?? [])
-  const url = spriteUrl(id, imageStyle)
+  const url = blobUrl ?? rawUrl
 
-  useEffect(() => { setLoaded(false) }, [url])
+  useEffect(() => {
+    if (!rawUrl) {
+      setBlobUrl(null)
+      setLoaded(false)
+      return
+    }
+    const cached = getCachedBlobUrl(rawUrl)
+    if (cached) {
+      setBlobUrl(cached)
+      setLoaded(true)
+      return
+    }
+    setBlobUrl(null)
+    setLoaded(false)
+    let cancelled = false
+    loadSprite(rawUrl).then((resolved) => {
+      if (!cancelled) {
+        setBlobUrl(resolved)
+        setLoaded(true)
+      }
+    })
+    return () => { cancelled = true }
+  }, [rawUrl])
 
   useEffect(() => {
     const cached = pokemonCache.get(id)
@@ -106,13 +131,11 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
               <div className="w-3/5 aspect-square animate-pulse rounded bg-gray-200" />
             )}
             <img
-              key={url}
-              src={url}
+              src={url ?? undefined}
               alt={`Pokémon #${id}`}
               crossOrigin="anonymous"
               className={`w-3/5 object-contain transition-opacity ${loaded ? 'opacity-100' : 'opacity-0 absolute'}`}
               style={isSilhouette ? { filter: 'brightness(0)' } : undefined}
-              onLoad={() => setLoaded(true)}
             />
           </>
         ) : (
