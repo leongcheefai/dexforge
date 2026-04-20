@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { useCardSettingsStore } from './store'
-import type { CardSettings } from './store'
+import { useCardSettingsStore, IMAGE_STYLE_OPTIONS } from './store'
+import type { CardSettings, ImageStyle } from './store'
 import { useDebounce } from '@/lib/useDebounce'
+import { useSelectionStore, GENERATION_PRESETS } from '@/features/selection/store'
+import type { GenerationPreset } from '@/features/selection/store'
 
 const MONO = { fontFamily: "'DM Mono', monospace" }
 
@@ -39,6 +41,68 @@ function Section({ children }: { children: React.ReactNode }) {
   )
 }
 
+const PRESET_OPTIONS: { value: GenerationPreset; label: string }[] = [
+  { value: 'custom', label: 'Custom Range' },
+  ...Object.entries(GENERATION_PRESETS).map(([key, { label }]) => ({
+    value: key as GenerationPreset,
+    label,
+  })),
+]
+
+function RangeSection() {
+  const { preset, fromId, toId, setPreset, setFromId, setToId } = useSelectionStore()
+
+  return (
+    <Section>
+      <SectionLabel>Pokémon Range</SectionLabel>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
+            Preset
+          </span>
+          <select
+            value={preset}
+            onChange={(e) => setPreset(e.target.value as GenerationPreset)}
+            className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
+          >
+            {PRESET_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
+              From #
+            </span>
+            <input
+              type="number"
+              min={1}
+              max={toId}
+              value={fromId}
+              onChange={(e) => setFromId(Math.max(1, parseInt(e.target.value) || 1))}
+              className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
+              To #
+            </span>
+            <input
+              type="number"
+              min={fromId}
+              max={1025}
+              value={toId}
+              onChange={(e) => setToId(Math.min(1025, parseInt(e.target.value) || 1))}
+              className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
+            />
+          </div>
+        </div>
+      </div>
+    </Section>
+  )
+}
+
 export function CardSettingsPanel() {
   const store = useCardSettingsStore()
 
@@ -65,6 +129,21 @@ export function CardSettingsPanel() {
       </div>
 
       <div className="flex flex-col overflow-y-auto flex-1">
+        <RangeSection />
+
+        <Section>
+          <SectionLabel>Image Style</SectionLabel>
+          <select
+            value={store.imageStyle}
+            onChange={(e) => store.setImageStyle(e.target.value as ImageStyle)}
+            className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
+          >
+            {IMAGE_STYLE_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </Section>
+
         <Section>
           <SectionLabel>Border Style</SectionLabel>
           <div className="grid grid-cols-4 gap-1.5">

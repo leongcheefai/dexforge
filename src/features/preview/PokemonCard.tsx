@@ -1,19 +1,11 @@
-import { useState } from 'react'
-import { useCardSettingsStore } from '@/features/customization/store'
-
-const SPRITE_URL =
-  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png'
+import { useState, useEffect } from 'react'
+import { useCardSettingsStore, spriteUrl } from '@/features/customization/store'
+import { useSelectionStore } from '@/features/selection/store'
 
 const FONT_FAMILIES = [
-  'Inter',
-  'Geist',
-  'Roboto',
-  'Merriweather',
-  'Space Mono',
-  'Lobster',
+  'Inter', 'Geist', 'Roboto', 'Merriweather', 'Space Mono', 'Lobster',
 ] as const
 
-// Verify the font family is one of the allowed options at runtime
 function isFontFamily(v: string): v is (typeof FONT_FAMILIES)[number] {
   return (FONT_FAMILIES as readonly string[]).includes(v)
 }
@@ -22,19 +14,31 @@ function borderClass(style: string): string {
   if (style === 'solid') return 'border-2'
   if (style === 'dashed') return 'border-2 border-dashed'
   if (style === 'rounded') return 'border-2 rounded-xl'
-  return '' // 'none'
+  return ''
+}
+
+function padId(id: number): string {
+  return String(id).padStart(3, '0')
 }
 
 interface PokemonCardProps {
+  pokemonId?: number
   mini?: boolean
 }
 
-export function PokemonCard({ mini = false }: PokemonCardProps) {
-  const { borderStyle, borderColor, backgroundColor, fontFamily, showName, showNumber } =
+export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
+  const { borderStyle, borderColor, backgroundColor, fontFamily, showName, showNumber, imageStyle } =
     useCardSettingsStore()
+  const { fromId } = useSelectionStore()
+  const id = pokemonId ?? fromId
+
   const [loaded, setLoaded] = useState(false)
+  const url = spriteUrl(id, imageStyle)
+
+  useEffect(() => { setLoaded(false) }, [url])
 
   const resolvedFont = isFontFamily(fontFamily) ? fontFamily : 'Inter'
+  const isSilhouette = imageStyle === 'silhouette'
 
   return (
     <div
@@ -42,22 +46,30 @@ export function PokemonCard({ mini = false }: PokemonCardProps) {
       style={{ aspectRatio: '63/88', borderColor, backgroundColor, fontFamily: resolvedFont }}
     >
       {showNumber && (
-        <span className={`self-start ${mini ? 'text-[6px]' : 'text-xs'}`}>#001</span>
+        <span className={`self-start ${mini ? 'text-[6px]' : 'text-xs'}`}>#{padId(id)}</span>
       )}
       <div className="flex flex-1 w-full items-center justify-center">
-        {!loaded && (
-          <div className="w-3/5 aspect-square animate-pulse rounded bg-gray-200" />
+        {url ? (
+          <>
+            {!loaded && (
+              <div className="w-3/5 aspect-square animate-pulse rounded bg-gray-200" />
+            )}
+            <img
+              key={url}
+              src={url}
+              alt={`Pokémon #${id}`}
+              crossOrigin="anonymous"
+              className={`w-3/5 object-contain transition-opacity ${loaded ? 'opacity-100' : 'opacity-0 absolute'}`}
+              style={isSilhouette ? { filter: 'brightness(0)' } : undefined}
+              onLoad={() => setLoaded(true)}
+            />
+          </>
+        ) : (
+          <div className="w-3/5 aspect-square" />
         )}
-        <img
-          src={SPRITE_URL}
-          alt="Bulbasaur"
-          crossOrigin="anonymous"
-          className={`w-3/5 object-contain ${loaded ? 'block' : 'hidden'}`}
-          onLoad={() => setLoaded(true)}
-        />
       </div>
       {showName && (
-        <span className={`font-medium ${mini ? 'text-[8px]' : 'text-sm'}`}>Bulbasaur</span>
+        <span className={`font-medium ${mini ? 'text-[8px]' : 'text-sm'}`}>#{padId(id)}</span>
       )}
     </div>
   )

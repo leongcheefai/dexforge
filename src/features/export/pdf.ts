@@ -1,5 +1,6 @@
-import { useCardSettingsStore } from '@/features/customization/store'
+import { useCardSettingsStore, spriteUrl } from '@/features/customization/store'
 import type { CardSettings } from '@/features/customization/store'
+import { useSelectionStore } from '@/features/selection/store'
 
 const FONT_FAMILIES = ['Inter', 'Geist', 'Roboto', 'Merriweather', 'Space Mono', 'Lobster'] as const
 
@@ -12,9 +13,6 @@ export interface GeneratePdfOptions {
   cropMarks: boolean
   coverPage: boolean
 }
-
-const SPRITE_URL =
-  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png'
 
 const MM_TO_PT = 2.8346
 const CARD_W_PT = 63 * MM_TO_PT  // 178.58pt
@@ -53,7 +51,7 @@ function roundRect(
   ctx.stroke()
 }
 
-async function renderCardToPng(settings: CardSettings): Promise<Uint8Array> {
+async function renderCardToPng(settings: CardSettings, pokemonId: number): Promise<Uint8Array> {
   // 10px per mm — 630×880 canvas for a 63×88mm card
   const W = 630
   const H = 880
@@ -87,35 +85,53 @@ async function renderCardToPng(settings: CardSettings): Promise<Uint8Array> {
 
   const safeFont = isFontFamily(settings.fontFamily) ? settings.fontFamily : 'Inter'
 
+  const paddedId = String(pokemonId).padStart(3, '0')
+
   // Number
   if (settings.showNumber) {
     ctx.fillStyle = '#000000'
     ctx.textAlign = 'left'
     ctx.font = `20px ${safeFont}, sans-serif`
-    ctx.fillText('#001', 20, 44)
+    ctx.fillText(`#${paddedId}`, 20, 44)
   }
 
-  // Sprite — load as Image with crossOrigin so canvas remains un-tainted
-  await new Promise<void>((resolve, reject) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const size = W * 0.6
-      const x = (W - size) / 2
-      const y = (H - size) / 2 - 30
-      ctx.drawImage(img, x, y, size, size)
-      resolve()
-    }
-    img.onerror = () => reject(new Error('Failed to load sprite from GitHub CDN'))
-    img.src = SPRITE_URL
-  })
+  // Sprite
+  const url = spriteUrl(pokemonId, settings.imageStyle)
+  if (url) {
+    await new Promise<void>((resolve, reject) => {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => {
+        const size = W * 0.6
+        const x = (W - size) / 2
+        const y = (H - size) / 2 - 30
+        if (settings.imageStyle === 'silhouette') {
+          // Draw to offscreen canvas, then composite as black
+          const off = document.createElement('canvas')
+          off.width = size
+          off.height = size
+          const offCtx = off.getContext('2d')!
+          offCtx.drawImage(img, 0, 0, size, size)
+          offCtx.globalCompositeOperation = 'source-in'
+          offCtx.fillStyle = '#000000'
+          offCtx.fillRect(0, 0, size, size)
+          ctx.drawImage(off, x, y)
+        } else {
+          ctx.drawImage(img, x, y, size, size)
+        }
+        resolve()
+      }
+      img.onerror = () => reject(new Error(`Failed to load sprite for #${paddedId}`))
+      img.src = url
+    })
+  }
 
   // Name
   if (settings.showName) {
     ctx.fillStyle = '#000000'
     ctx.textAlign = 'center'
     ctx.font = `bold 32px ${safeFont}, sans-serif`
-    ctx.fillText('Bulbasaur', W / 2, H - 28)
+    ctx.fillText(`#${paddedId}`, W / 2, H - 28)
   }
 
   // Export canvas to PNG bytes
@@ -141,6 +157,7 @@ export async function generatePdf(options: GeneratePdfOptions): Promise<Uint8Arr
   const { PDFDocument, rgb } = await import('pdf-lib')
 
   const settings = useCardSettingsStore.getState()
+  const { fromId } = useSelectionStore.getState()
   const [pageW, pageH] = PAGE_DIM[options.paperSize]
   const doc = await PDFDocument.create()
 
@@ -159,7 +176,7 @@ export async function generatePdf(options: GeneratePdfOptions): Promise<Uint8Arr
   }
 
   // Render card to PNG and embed
-  const pngBytes = await renderCardToPng(settings)
+  const pngBytes = await renderCardToPng(settings, fromId)
   const pngImage = await doc.embedPng(pngBytes)
 
   // Card page
