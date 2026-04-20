@@ -33,9 +33,25 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
   const id = pokemonId ?? fromId
 
   const [loaded, setLoaded] = useState(false)
+  const [name, setName] = useState<string | null>(null)
   const url = spriteUrl(id, imageStyle)
 
   useEffect(() => { setLoaded(false) }, [url])
+
+  useEffect(() => {
+    let cancelled = false
+    setName(null)
+    fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled) {
+          const raw: string = data.name ?? ''
+          setName(raw.charAt(0).toUpperCase() + raw.slice(1))
+        }
+      })
+      .catch(() => { /* silently fall back to no name */ })
+    return () => { cancelled = true }
+  }, [id])
 
   const resolvedFont = isFontFamily(fontFamily) ? fontFamily : 'Inter'
   const isSilhouette = imageStyle === 'silhouette'
@@ -69,7 +85,9 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
         )}
       </div>
       {showName && (
-        <span className={`font-medium ${mini ? 'text-[8px]' : 'text-sm'}`}>#{padId(id)}</span>
+        <span className={`font-medium ${mini ? 'text-[8px]' : 'text-sm'}`}>
+          {name ?? `#${padId(id)}`}
+        </span>
       )}
     </div>
   )

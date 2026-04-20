@@ -51,6 +51,16 @@ function roundRect(
   ctx.stroke()
 }
 
+async function fetchPokemonName(id: number): Promise<string> {
+  try {
+    const data = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then((r) => r.json())
+    const raw: string = data.name ?? ''
+    return raw.charAt(0).toUpperCase() + raw.slice(1)
+  } catch {
+    return `#${String(id).padStart(3, '0')}`
+  }
+}
+
 async function renderCardToPng(settings: CardSettings, pokemonId: number): Promise<Uint8Array> {
   // 10px per mm — 630×880 canvas for a 63×88mm card
   const W = 630
@@ -86,6 +96,7 @@ async function renderCardToPng(settings: CardSettings, pokemonId: number): Promi
   const safeFont = isFontFamily(settings.fontFamily) ? settings.fontFamily : 'Inter'
 
   const paddedId = String(pokemonId).padStart(3, '0')
+  const pokemonName = await fetchPokemonName(pokemonId)
 
   // Number
   if (settings.showNumber) {
@@ -131,7 +142,7 @@ async function renderCardToPng(settings: CardSettings, pokemonId: number): Promi
     ctx.fillStyle = '#000000'
     ctx.textAlign = 'center'
     ctx.font = `bold 32px ${safeFont}, sans-serif`
-    ctx.fillText(`#${paddedId}`, W / 2, H - 28)
+    ctx.fillText(pokemonName, W / 2, H - 28)
   }
 
   // Export canvas to PNG bytes
