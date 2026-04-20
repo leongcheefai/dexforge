@@ -15,7 +15,6 @@ export function PrintSheet() {
 
   return (
     <div id="print-sheet" style={{ display: 'none' }}>
-      <div id="print-title" style={{ display: 'none' }}>POCKET PAGES</div>
       {pages.map((pageIds, pageIdx) => (
         <div
           key={pageIdx}
