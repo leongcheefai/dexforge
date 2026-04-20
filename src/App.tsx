@@ -101,6 +101,41 @@ export default function App() {
         </DialogContent>
       </Dialog>
 
+      <footer className="sr-only">
+        <h2>About PaperDex</h2>
+        <p>
+          PaperDex is a free, browser-based tool for generating printable Pokémon binder placeholder
+          PDFs. Collectors use it to fill empty slots in their Pokémon card binders with
+          custom-designed placeholders while they hunt for the real cards.
+        </p>
+        <h3>How it works</h3>
+        <p>
+          Select Pokémon by generation preset, name search, or Pokédex number range. Choose from
+          seven sprite styles including Gen 1–5 pixel art and official artwork. Customize card
+          border color, background gradient, font family, and whether to show the Pokédex number.
+          The live 3×3 page preview updates instantly, and when you are ready, export to a
+          print-ready PDF via pdf-lib or use your browser's built-in print dialog.
+        </p>
+        <h3>Features</h3>
+        <ul>
+          <li>Over 1000 Pokémon supported, sourced from PokéAPI</li>
+          <li>Seven sprite styles: default, shiny, female, pixel art (Gen 1–5)</li>
+          <li>Multi-language Pokémon names</li>
+          <li>Custom border styles, colors, and card fonts</li>
+          <li>Pokédex number toggle and gradient backgrounds</li>
+          <li>Generation presets for quick selection</li>
+          <li>Sprites and API responses cached locally for offline use</li>
+          <li>No account, no login, completely free</li>
+        </ul>
+        <h3>Who is it for?</h3>
+        <p>
+          PaperDex is built for Pokémon TCG collectors who want neat, consistent placeholders in
+          their binders. Whether you are building a living Pokédex binder, organizing sets, or just
+          keeping track of missing cards, PaperDex lets you print professional-looking placeholders
+          in minutes.
+        </p>
+      </footer>
+
       <PrintSheet />
       <Toaster />
     </>
