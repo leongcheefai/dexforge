@@ -1,3 +1,5 @@
+import { PreviewCanvas } from '@/features/preview/PreviewCanvas'
+
 export default function App() {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -9,10 +11,10 @@ export default function App() {
       </header>
       <div className="flex" style={{ height: 'calc(100vh - 3.5rem)' }}>
         <aside className="w-80 border-r overflow-y-auto p-4 shrink-0">
-          {/* Controls sidebar — features/selection, features/customization mount here */}
+          {/* CardSettingsPanel mounts here in Task 5 */}
         </aside>
-        <main className="flex-1 flex items-center justify-center">
-          {/* Preview canvas — features/preview mounts here */}
+        <main className="flex-1 overflow-y-auto">
+          <PreviewCanvas />
         </main>
       </div>
     </div>
