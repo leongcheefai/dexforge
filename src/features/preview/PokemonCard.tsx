@@ -53,8 +53,8 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
   const id = pokemonId ?? fromId
 
   const [loaded, setLoaded] = useState(false)
-  const [name, setName] = useState<string | null>(null)
-  const [types, setTypes] = useState<string[]>([])
+  const [name, setName] = useState<string | null>(() => pokemonCache.get(id)?.name ?? null)
+  const [types, setTypes] = useState<string[]>(() => pokemonCache.get(id)?.types ?? [])
   const url = spriteUrl(id, imageStyle)
 
   useEffect(() => { setLoaded(false) }, [url])
@@ -66,6 +66,8 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
       setTypes(cached.types)
       return
     }
+    setName(null)
+    setTypes([])
     let cancelled = false
     setName(null)
     setTypes([])

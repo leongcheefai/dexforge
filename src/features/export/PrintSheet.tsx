@@ -4,9 +4,10 @@ import { PokemonCard } from '@/features/preview/PokemonCard'
 const CARDS_PER_PAGE = 9
 
 export function PrintSheet() {
-  const { fromId, toId } = useSelectionStore()
+  const { fromId, toId, isGenerated, isPrefetching } = useSelectionStore()
+  const ready = isGenerated && !isPrefetching
 
-  const ids = Array.from({ length: toId - fromId + 1 }, (_, i) => fromId + i)
+  const ids = ready ? Array.from({ length: toId - fromId + 1 }, (_, i) => fromId + i) : []
   const pages: number[][] = []
   for (let i = 0; i < ids.length; i += CARDS_PER_PAGE) {
     pages.push(ids.slice(i, i + CARDS_PER_PAGE))
