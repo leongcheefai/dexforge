@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { Download } from 'lucide-react'
 import { Toaster } from '@/components/ui/sonner'
 import { Button } from '@/components/ui/button'
@@ -138,6 +139,7 @@ export default function App() {
 
       <PrintSheet />
       <Toaster />
+      <Analytics />
     </>
   )
 }
