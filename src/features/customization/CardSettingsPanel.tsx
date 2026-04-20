@@ -237,6 +237,16 @@ export function CardSettingsPanel() {
                 onCheckedChange={store.setShowNumber}
               />
             </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="show-type-badges" className="text-sm text-foreground/70 cursor-pointer font-normal">
+                Show Type Badges
+              </Label>
+              <Switch
+                id="show-type-badges"
+                checked={store.showTypeBadges}
+                onCheckedChange={store.setShowTypeBadges}
+              />
+            </div>
           </div>
         </Section>
       </div>

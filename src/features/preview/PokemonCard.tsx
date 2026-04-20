@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useCardSettingsStore, spriteUrl } from '@/features/customization/store'
 import { useSelectionStore } from '@/features/selection/store'
+import { typeColor } from '@/lib/pokemon-types'
 
 const FONT_FAMILIES = [
   'Inter', 'Geist', 'Roboto', 'Merriweather', 'Space Mono', 'Lobster',
@@ -27,13 +28,14 @@ interface PokemonCardProps {
 }
 
 export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
-  const { borderStyle, borderColor, backgroundColor, fontFamily, showName, showNumber, imageStyle } =
+  const { borderStyle, borderColor, backgroundColor, fontFamily, showName, showNumber, showTypeBadges, imageStyle } =
     useCardSettingsStore()
   const { fromId } = useSelectionStore()
   const id = pokemonId ?? fromId
 
   const [loaded, setLoaded] = useState(false)
   const [name, setName] = useState<string | null>(null)
+  const [types, setTypes] = useState<string[]>([])
   const url = spriteUrl(id, imageStyle)
 
   useEffect(() => { setLoaded(false) }, [url])
@@ -41,15 +43,18 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
   useEffect(() => {
     let cancelled = false
     setName(null)
+    setTypes([])
     fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
       .then((r) => r.json())
       .then((data) => {
         if (!cancelled) {
           const raw: string = data.name ?? ''
           setName(raw.charAt(0).toUpperCase() + raw.slice(1))
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          setTypes((data.types ?? []).map((t: any) => t.type.name as string))
         }
       })
-      .catch(() => { /* silently fall back to no name */ })
+      .catch(() => {})
     return () => { cancelled = true }
   }, [id])
 
@@ -84,11 +89,26 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
           <div className="w-3/5 aspect-square" />
         )}
       </div>
-      {showName && (
-        <span className={`font-medium ${mini ? 'text-[8px]' : 'text-sm'}`}>
-          {name ?? `#${padId(id)}`}
-        </span>
-      )}
+      <div className={`flex flex-col items-center gap-0.5 w-full ${mini ? 'gap-0' : 'gap-1'}`}>
+        {showTypeBadges && types.length > 0 && (
+          <div className="flex gap-1 justify-center">
+            {types.map((t) => (
+              <span
+                key={t}
+                className={`rounded-full font-semibold uppercase tracking-wide text-white ${mini ? 'text-[4px] px-1 py-px' : 'text-[9px] px-2 py-0.5'}`}
+                style={{ backgroundColor: typeColor(t) }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
+        {showName && (
+          <span className={`font-medium ${mini ? 'text-[8px]' : 'text-sm'}`}>
+            {name ?? `#${padId(id)}`}
+          </span>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useCardSettingsStore, spriteUrl } from '@/features/customization/store'
 import type { CardSettings } from '@/features/customization/store'
 import { useSelectionStore } from '@/features/selection/store'
+import { typeColor } from '@/lib/pokemon-types'
 
 const FONT_FAMILIES = ['Inter', 'Geist', 'Roboto', 'Merriweather', 'Space Mono', 'Lobster'] as const
 
@@ -51,13 +52,15 @@ function roundRect(
   ctx.stroke()
 }
 
-async function fetchPokemonName(id: number): Promise<string> {
+async function fetchPokemon(id: number): Promise<{ name: string; types: string[] }> {
   try {
     const data = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then((r) => r.json())
     const raw: string = data.name ?? ''
-    return raw.charAt(0).toUpperCase() + raw.slice(1)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const types: string[] = (data.types ?? []).map((t: any) => t.type.name as string)
+    return { name: raw.charAt(0).toUpperCase() + raw.slice(1), types }
   } catch {
-    return `#${String(id).padStart(3, '0')}`
+    return { name: `#${String(id).padStart(3, '0')}`, types: [] }
   }
 }
 
@@ -96,7 +99,7 @@ async function renderCardToPng(settings: CardSettings, pokemonId: number): Promi
   const safeFont = isFontFamily(settings.fontFamily) ? settings.fontFamily : 'Inter'
 
   const paddedId = String(pokemonId).padStart(3, '0')
-  const pokemonName = await fetchPokemonName(pokemonId)
+  const { name: pokemonName, types: pokemonTypes } = await fetchPokemon(pokemonId)
 
   // Number
   if (settings.showNumber) {
@@ -135,6 +138,29 @@ async function renderCardToPng(settings: CardSettings, pokemonId: number): Promi
       img.onerror = () => reject(new Error(`Failed to load sprite for #${paddedId}`))
       img.src = url
     })
+  }
+
+  // Type badges
+  if (settings.showTypeBadges && pokemonTypes.length > 0) {
+    const badgeH = 36
+    const badgeRadius = 18
+    const badgePadX = 24
+    const gap = 12
+    ctx.font = `bold 20px ${safeFont}, sans-serif`
+    const widths = pokemonTypes.map((t) => ctx.measureText(t.toUpperCase()).width + badgePadX * 2)
+    const totalW = widths.reduce((a, b) => a + b, 0) + gap * (pokemonTypes.length - 1)
+    let bx = (W - totalW) / 2
+    const by = H - (settings.showName ? 110 : 60)
+    for (let i = 0; i < pokemonTypes.length; i++) {
+      ctx.fillStyle = typeColor(pokemonTypes[i])
+      ctx.beginPath()
+      ctx.roundRect(bx, by, widths[i], badgeH, badgeRadius)
+      ctx.fill()
+      ctx.fillStyle = '#ffffff'
+      ctx.textAlign = 'center'
+      ctx.fillText(pokemonTypes[i].toUpperCase(), bx + widths[i] / 2, by + badgeH - 10)
+      bx += widths[i] + gap
+    }
   }
 
   // Name

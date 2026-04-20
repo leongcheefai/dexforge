@@ -30,6 +30,7 @@ export interface CardSettings {
   fontFamily: string
   showName: boolean
   showNumber: boolean
+  showTypeBadges: boolean
   imageStyle: ImageStyle
 }
 
@@ -40,6 +41,7 @@ interface CardSettingsStore extends CardSettings {
   setFontFamily: (v: string) => void
   setShowName: (v: boolean) => void
   setShowNumber: (v: boolean) => void
+  setShowTypeBadges: (v: boolean) => void
   setImageStyle: (v: ImageStyle) => void
 }
 
@@ -50,6 +52,7 @@ export const useCardSettingsStore = create<CardSettingsStore>((set) => ({
   fontFamily: 'Inter',
   showName: true,
   showNumber: true,
+  showTypeBadges: true,
   imageStyle: 'pixels',
   setBorderStyle: (v) => set({ borderStyle: v }),
   setBorderColor: (v) => set({ borderColor: v }),
@@ -57,5 +60,6 @@ export const useCardSettingsStore = create<CardSettingsStore>((set) => ({
   setFontFamily: (v) => set({ fontFamily: v }),
   setShowName: (v) => set({ showName: v }),
   setShowNumber: (v) => set({ showNumber: v }),
+  setShowTypeBadges: (v) => set({ showTypeBadges: v }),
   setImageStyle: (v) => set({ imageStyle: v }),
 }))
