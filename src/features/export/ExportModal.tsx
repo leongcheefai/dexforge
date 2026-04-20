@@ -24,7 +24,7 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
     try {
       const { generatePdf } = await import('./pdf')
       const bytes = await generatePdf({ paperSize, cropMarks, coverPage })
-      const blob = new Blob([bytes], { type: 'application/pdf' })
+      const blob = new Blob([bytes as BlobPart], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -53,7 +53,7 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
             <Label className="text-sm font-medium">Paper Size</Label>
             <RadioGroup
               value={paperSize}
-              onValueChange={(v) => setPaperSize(v as GeneratePdfOptions['paperSize'])}
+              onValueChange={(v: string) => setPaperSize(v as GeneratePdfOptions['paperSize'])}
               className="flex gap-4"
             >
               <div className="flex items-center gap-2">
@@ -72,7 +72,7 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
             <Checkbox
               id="crop-marks"
               checked={cropMarks}
-              onCheckedChange={(v) => setCropMarks(!!v)}
+              onCheckedChange={(v: boolean | 'indeterminate') => setCropMarks(!!v)}
             />
             <Label htmlFor="crop-marks">Include crop marks</Label>
           </div>
@@ -82,7 +82,7 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
             <Checkbox
               id="cover-page"
               checked={coverPage}
-              onCheckedChange={(v) => setCoverPage(!!v)}
+              onCheckedChange={(v: boolean | 'indeterminate') => setCoverPage(!!v)}
             />
             <Label htmlFor="cover-page">Include cover page</Label>
           </div>
