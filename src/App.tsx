@@ -21,7 +21,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="h-14 border-b flex items-center justify-between px-4">
-        <span className="font-semibold tracking-tight">DexForge</span>
+        <span className="font-semibold tracking-tight">PocketPages</span>
         <button
           onClick={() => setExportOpen(true)}
           className="px-4 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium"

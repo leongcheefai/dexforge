@@ -24,11 +24,11 @@ export function ExportModal({ open, onOpenChange }: ExportModalProps) {
     try {
       const { generatePdf } = await import('./pdf')
       const bytes = await generatePdf({ paperSize, cropMarks, coverPage })
-      const blob = new Blob([bytes], { type: 'application/pdf' })
+      const blob = new Blob([bytes.buffer as ArrayBuffer], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'dexforge.pdf'
+      a.download = 'pocketpages.pdf'
       a.click()
       URL.revokeObjectURL(url)
       onOpenChange(false)

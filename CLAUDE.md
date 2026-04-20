@@ -11,11 +11,13 @@ npm run lint      # ESLint (flat config)
 npm run preview   # Preview production build
 ```
 
+Always run `npm run build` before committing or pushing to catch TypeScript and build errors.
+
 No test framework configured yet.
 
 ## Architecture
 
-**DexForge** is a fully client-side SPA for generating customizable printable Pokémon card placeholder PDFs (binder placeholders). No backend.
+**PocketPages** is a fully client-side SPA for generating customizable printable Pokémon card placeholder PDFs (binder placeholders). No backend.
 
 **Stack**: Vite + React 19 + TypeScript + Tailwind CSS v4 + shadcn/ui (radix-nova preset) + Zustand v5 + pdf-lib + idb-keyval
 

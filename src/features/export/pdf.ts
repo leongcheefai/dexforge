@@ -147,7 +147,7 @@ export async function generatePdf(options: GeneratePdfOptions): Promise<Uint8Arr
   // Optional cover page
   if (options.coverPage) {
     const cover = doc.addPage([pageW, pageH])
-    cover.drawText('DexForge', {
+    cover.drawText('PocketPages', {
       x: pageW / 2 - 60,
       y: pageH / 2 + 20,
       size: 36,
