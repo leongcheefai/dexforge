@@ -1,12 +1,31 @@
-import { PreviewCanvas } from '@/features/preview/PreviewCanvas'
+import { useState, useEffect } from 'react'
+import { Toaster } from '@/components/ui/sonner'
 import { CardSettingsPanel } from '@/features/customization/CardSettingsPanel'
+import { ExportModal } from '@/features/export/ExportModal'
+import { PreviewCanvas } from '@/features/preview/PreviewCanvas'
 
 export default function App() {
+  const [exportOpen, setExportOpen] = useState(false)
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
+        e.preventDefault()
+        setExportOpen(true)
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [])
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="h-14 border-b flex items-center justify-between px-4">
         <span className="font-semibold tracking-tight">DexForge</span>
-        <button className="px-4 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium">
+        <button
+          onClick={() => setExportOpen(true)}
+          className="px-4 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium"
+        >
           Export PDF
         </button>
       </header>
@@ -18,6 +37,8 @@ export default function App() {
           <PreviewCanvas />
         </main>
       </div>
+      <ExportModal open={exportOpen} onOpenChange={setExportOpen} />
+      <Toaster />
     </div>
   )
 }
