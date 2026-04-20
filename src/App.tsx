@@ -111,7 +111,7 @@ export default function App() {
         <h3>How it works</h3>
         <p>
           Select Pokémon by generation preset, name search, or Pokédex number range. Choose from
-          seven sprite styles including Gen 1–5 pixel art and official artwork. Customize card
+          seven sprite styles including Gen 1–9 pixel art and official artwork. Customize card
           border color, background gradient, font family, and whether to show the Pokédex number.
           The live 3×3 page preview updates instantly, and when you are ready, export to a
           print-ready PDF via pdf-lib or use your browser's built-in print dialog.
@@ -119,7 +119,7 @@ export default function App() {
         <h3>Features</h3>
         <ul>
           <li>Over 1000 Pokémon supported, sourced from PokéAPI</li>
-          <li>Seven sprite styles: default, shiny, female, pixel art (Gen 1–5)</li>
+          <li>Seven sprite styles: default, shiny, female, pixel art (Gen 1–9)</li>
           <li>Multi-language Pokémon names</li>
           <li>Custom border styles, colors, and card fonts</li>
           <li>Pokédex number toggle and gradient backgrounds</li>
