@@ -60,3 +60,22 @@ body {
   background-color: oklch(0.97 0.005 75);
   -webkit-font-smoothing: antialiased;
 }
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  body {
+    background: white;
+  }
+
+  #app-shell {
+    display: none !important;
+  }
+
+  #print-sheet {
+    display: block !important;
+  }
+}
