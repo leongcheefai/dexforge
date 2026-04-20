@@ -1,6 +1,12 @@
 import { useCardSettingsStore } from '@/features/customization/store'
 import type { CardSettings } from '@/features/customization/store'
 
+const FONT_FAMILIES = ['Inter', 'Geist', 'Roboto', 'Merriweather', 'Space Mono', 'Lobster'] as const
+
+function isFontFamily(v: string): v is (typeof FONT_FAMILIES)[number] {
+  return (FONT_FAMILIES as readonly string[]).includes(v)
+}
+
 export interface GeneratePdfOptions {
   paperSize: 'a4' | 'letter'
   cropMarks: boolean
@@ -79,11 +85,13 @@ async function renderCardToPng(settings: CardSettings): Promise<Uint8Array> {
   // Ensure Google Fonts are loaded before drawing text
   await document.fonts.ready
 
+  const safeFont = isFontFamily(settings.fontFamily) ? settings.fontFamily : 'Inter'
+
   // Number
   if (settings.showNumber) {
     ctx.fillStyle = '#000000'
     ctx.textAlign = 'left'
-    ctx.font = `20px ${settings.fontFamily}, sans-serif`
+    ctx.font = `20px ${safeFont}, sans-serif`
     ctx.fillText('#001', 20, 44)
   }
 
@@ -106,7 +114,7 @@ async function renderCardToPng(settings: CardSettings): Promise<Uint8Array> {
   if (settings.showName) {
     ctx.fillStyle = '#000000'
     ctx.textAlign = 'center'
-    ctx.font = `bold 32px ${settings.fontFamily}, sans-serif`
+    ctx.font = `bold 32px ${safeFont}, sans-serif`
     ctx.fillText('Bulbasaur', W / 2, H - 28)
   }
 
