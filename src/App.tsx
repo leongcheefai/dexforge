@@ -22,10 +22,10 @@ export default function App() {
         >
           <div className="flex items-center gap-0.5" style={{ fontFamily: "'Cinzel', serif" }}>
             <span className="text-base font-semibold tracking-[0.18em] text-primary">
-              POCKET
+              PAPER
             </span>
             <span className="text-base font-light tracking-[0.18em] text-foreground/40 ml-1">
-              PAGES
+              DEX
             </span>
           </div>
 
