@@ -28,14 +28,14 @@ export default function App() {
             boxShadow: '0 1px 0 oklch(0.52 0.22 25 / 0.18)',
           }}
         >
-          <div className="flex items-center gap-0.5" style={{ fontFamily: "'Cinzel', serif" }}>
+          <h1 className="flex items-center gap-0.5 m-0" style={{ fontFamily: "'Cinzel', serif" }}>
             <span className="text-base font-semibold tracking-[0.18em] text-primary">
               PAPER
             </span>
             <span className="text-base font-light tracking-[0.18em] text-foreground/40 ml-1">
               DEX
             </span>
-          </div>
+          </h1>
 
           <div className="flex items-center gap-3">
             <span className="text-[10px] tracking-widest text-muted-foreground uppercase hidden sm:block" style={{ fontFamily: "'DM Mono', monospace" }}>
@@ -63,9 +63,11 @@ export default function App() {
 
         <div className="flex" style={{ height: 'calc(100vh - 4rem)' }}>
           <aside className="w-72 border-r border-border overflow-y-auto shrink-0 bg-card">
+            <h2 className="sr-only">Card Settings</h2>
             <CardSettingsPanel />
           </aside>
           <main className="flex-1 overflow-y-auto bg-background">
+            <h2 className="sr-only">Binder Preview</h2>
             <PreviewCanvas />
           </main>
         </div>
