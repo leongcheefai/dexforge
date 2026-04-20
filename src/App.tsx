@@ -4,8 +4,12 @@ import { Button } from '@/components/ui/button'
 import { CardSettingsPanel } from '@/features/customization/CardSettingsPanel'
 import { PreviewCanvas } from '@/features/preview/PreviewCanvas'
 import { PrintSheet } from '@/features/export/PrintSheet'
+import { useSelectionStore } from '@/features/selection/store'
 
 export default function App() {
+  const { isGenerated, isPrefetching } = useSelectionStore()
+  const printDisabled = !isGenerated || isPrefetching
+
   return (
     <>
       <div id="app-shell" className="min-h-screen bg-background text-foreground">
@@ -31,11 +35,12 @@ export default function App() {
             </span>
             <Button
               onClick={() => window.print()}
+              disabled={printDisabled}
               size="sm"
               className="gap-1.5 uppercase tracking-widest text-[11px] font-semibold h-8 px-4"
             >
               <Download className="h-3 w-3" />
-              Print
+              {isPrefetching ? 'Loading…' : 'Print'}
             </Button>
           </div>
         </header>

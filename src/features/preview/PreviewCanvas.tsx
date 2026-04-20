@@ -8,9 +8,13 @@ const CARDS_PER_PAGE = 9
 export function PreviewCanvas() {
   const { isGenerated, fromId, toId } = useSelectionStore()
 
+  const setIsPrefetching = useSelectionStore((s) => s.setIsPrefetching)
+
   useEffect(() => {
-    if (isGenerated) prefetchRange(fromId, toId)
-  }, [isGenerated, fromId, toId])
+    if (!isGenerated) return
+    setIsPrefetching(true)
+    prefetchRange(fromId, toId).finally(() => setIsPrefetching(false))
+  }, [isGenerated, fromId, toId, setIsPrefetching])
 
   if (isGenerated) {
     const ids = Array.from({ length: toId - fromId + 1 }, (_, i) => fromId + i)
