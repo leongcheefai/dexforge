@@ -65,7 +65,7 @@ export function PreviewCanvas() {
           className="absolute pointer-events-none"
           style={{
             inset: '-5rem',
-            background: 'radial-gradient(ellipse 65% 65% at 50% 50%, oklch(0.60 0.155 75 / 0.07) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse 65% 65% at 50% 50%, oklch(0.52 0.22 25 / 0.06) 0%, transparent 70%)',
           }}
         />
         <div className="relative w-52 drop-shadow-2xl">

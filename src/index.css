@@ -28,26 +28,26 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Collector's Vault — warm ivory with amber gold */
+/* Pokémon — iconic red & yellow */
 :root {
-  --background: oklch(0.97 0.005 75);
-  --foreground: oklch(0.15 0.010 280);
+  --background: oklch(0.98 0.004 22);
+  --foreground: oklch(0.13 0.015 22);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.010 280);
+  --card-foreground: oklch(0.13 0.015 22);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.010 280);
-  --primary: oklch(0.60 0.155 75);
+  --popover-foreground: oklch(0.13 0.015 22);
+  --primary: oklch(0.52 0.22 25);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.93 0.005 75);
-  --secondary-foreground: oklch(0.15 0.010 280);
-  --muted: oklch(0.93 0.005 75);
-  --muted-foreground: oklch(0.50 0.012 280);
-  --accent: oklch(0.95 0.025 80);
-  --accent-foreground: oklch(0.60 0.155 75);
+  --secondary: oklch(0.94 0.008 22);
+  --secondary-foreground: oklch(0.13 0.015 22);
+  --muted: oklch(0.94 0.005 22);
+  --muted-foreground: oklch(0.50 0.010 22);
+  --accent: oklch(0.87 0.185 88);
+  --accent-foreground: oklch(0.28 0.08 40);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.88 0.006 75);
-  --input: oklch(0.93 0.005 75);
-  --ring: oklch(0.60 0.155 75);
+  --border: oklch(0.88 0.014 22);
+  --input: oklch(0.94 0.005 22);
+  --ring: oklch(0.52 0.22 25);
   --radius: 0.5rem;
 }
 
@@ -57,7 +57,7 @@ html {
 
 body {
   font-family: 'DM Sans', sans-serif;
-  background-color: oklch(0.97 0.005 75);
+  background-color: oklch(0.98 0.004 22);
   -webkit-font-smoothing: antialiased;
 }
 

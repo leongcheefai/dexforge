@@ -16,8 +16,8 @@ export default function App() {
         <header
           className="h-16 flex items-center justify-between px-6 shrink-0 border-b border-border"
           style={{
-            background: 'linear-gradient(to bottom, oklch(1 0 0), oklch(0.98 0.004 75))',
-            boxShadow: '0 1px 0 oklch(0.60 0.155 75 / 0.15)',
+            background: 'linear-gradient(to bottom, oklch(1 0 0), oklch(0.97 0.006 22))',
+            boxShadow: '0 1px 0 oklch(0.52 0.22 25 / 0.18)',
           }}
         >
           <div className="flex items-center gap-0.5" style={{ fontFamily: "'Cinzel', serif" }}>
