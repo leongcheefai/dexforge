@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useCardSettingsStore, IMAGE_STYLE_OPTIONS } from './store'
 import type { CardSettings, ImageStyle } from './store'
 import { useDebounce } from '@/lib/useDebounce'
@@ -61,15 +68,16 @@ function RangeSection() {
           <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
             Preset
           </span>
-          <select
-            value={preset}
-            onChange={(e) => setPreset(e.target.value as GenerationPreset)}
-            className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
-          >
-            {PRESET_OPTIONS.map(({ value, label }) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
+          <Select value={preset} onValueChange={(v: string) => setPreset(v as GenerationPreset)}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PRESET_OPTIONS.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>{label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="flex flex-col gap-1.5">
@@ -135,15 +143,16 @@ export function CardSettingsPanel() {
 
         <Section>
           <SectionLabel>Image Style</SectionLabel>
-          <select
-            value={store.imageStyle}
-            onChange={(e) => store.setImageStyle(e.target.value as ImageStyle)}
-            className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
-          >
-            {IMAGE_STYLE_OPTIONS.map(({ value, label }) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
+          <Select value={store.imageStyle} onValueChange={(v: string) => store.setImageStyle(v as ImageStyle)}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {IMAGE_STYLE_OPTIONS.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>{label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Section>
 
         <Section>
@@ -203,17 +212,16 @@ export function CardSettingsPanel() {
 
         <Section>
           <SectionLabel>Typography</SectionLabel>
-          <select
-            value={store.fontFamily}
-            onChange={(e) => store.setFontFamily(e.target.value)}
-            className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
-          >
-            {FONT_FAMILIES.map((f) => (
-              <option key={f} value={f} style={{ fontFamily: f }}>
-                {f}
-              </option>
-            ))}
-          </select>
+          <Select value={store.fontFamily} onValueChange={(v: string) => store.setFontFamily(v)}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {FONT_FAMILIES.map((f) => (
+                <SelectItem key={f} value={f} style={{ fontFamily: f }}>{f}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </Section>
 
         <Section>

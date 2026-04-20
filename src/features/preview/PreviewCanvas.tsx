@@ -1,4 +1,5 @@
-import { PokemonCard } from './PokemonCard'
+import { useEffect } from 'react'
+import { PokemonCard, prefetchRange } from './PokemonCard'
 import { PageThumbnail } from './PageThumbnail'
 import { useSelectionStore } from '@/features/selection/store'
 
@@ -6,6 +7,10 @@ const CARDS_PER_PAGE = 9
 
 export function PreviewCanvas() {
   const { isGenerated, fromId, toId } = useSelectionStore()
+
+  useEffect(() => {
+    if (isGenerated) prefetchRange(fromId, toId)
+  }, [isGenerated, fromId, toId])
 
   if (isGenerated) {
     const ids = Array.from({ length: toId - fromId + 1 }, (_, i) => fromId + i)

@@ -3,6 +3,25 @@ import { useCardSettingsStore, spriteUrl } from '@/features/customization/store'
 import { useSelectionStore } from '@/features/selection/store'
 import { typeColor } from '@/lib/pokemon-types'
 
+const pokemonCache = new Map<number, { name: string; types: string[] }>()
+
+async function fetchPokemonData(id: number): Promise<void> {
+  if (pokemonCache.has(id)) return
+  try {
+    const data = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then((r) => r.json())
+    const raw: string = data.name ?? ''
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    pokemonCache.set(id, { name: raw.charAt(0).toUpperCase() + raw.slice(1), types: (data.types ?? []).map((t: any) => t.type.name as string) })
+  } catch { /* ignore */ }
+}
+
+export async function prefetchRange(from: number, to: number, concurrency = 12): Promise<void> {
+  const ids = Array.from({ length: to - from + 1 }, (_, i) => from + i).filter((id) => !pokemonCache.has(id))
+  for (let i = 0; i < ids.length; i += concurrency) {
+    await Promise.all(ids.slice(i, i + concurrency).map(fetchPokemonData))
+  }
+}
+
 const FONT_FAMILIES = [
   'Inter', 'Geist', 'Roboto', 'Merriweather', 'Space Mono', 'Lobster',
 ] as const
@@ -41,6 +60,12 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
   useEffect(() => { setLoaded(false) }, [url])
 
   useEffect(() => {
+    const cached = pokemonCache.get(id)
+    if (cached) {
+      setName(cached.name)
+      setTypes(cached.types)
+      return
+    }
     let cancelled = false
     setName(null)
     setTypes([])
@@ -49,9 +74,12 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
       .then((data) => {
         if (!cancelled) {
           const raw: string = data.name ?? ''
-          setName(raw.charAt(0).toUpperCase() + raw.slice(1))
+          const name = raw.charAt(0).toUpperCase() + raw.slice(1)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          setTypes((data.types ?? []).map((t: any) => t.type.name as string))
+          const types = (data.types ?? []).map((t: any) => t.type.name as string)
+          pokemonCache.set(id, { name, types })
+          setName(name)
+          setTypes(types)
         }
       })
       .catch(() => {})
