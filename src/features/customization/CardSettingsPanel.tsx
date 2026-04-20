@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 import { useCardSettingsStore, IMAGE_STYLE_OPTIONS } from './store'
 import type { CardSettings, ImageStyle } from './store'
 import { useDebounce } from '@/lib/useDebounce'
@@ -105,6 +106,7 @@ function RangeSection() {
 
 export function CardSettingsPanel() {
   const store = useCardSettingsStore()
+  const { fromId, toId, generate } = useSelectionStore()
 
   const [borderColorDraft, setBorderColorDraft] = useState(store.borderColor)
   const [bgColorDraft, setBgColorDraft] = useState(store.backgroundColor)
@@ -249,6 +251,15 @@ export function CardSettingsPanel() {
             </div>
           </div>
         </Section>
+      </div>
+
+      <div className="px-5 py-4 border-t border-border shrink-0">
+        <Button
+          className="w-full uppercase tracking-widest text-[11px] font-semibold h-9"
+          onClick={generate}
+        >
+          Generate #{String(fromId).padStart(3, '0')}–#{String(toId).padStart(3, '0')}
+        </Button>
       </div>
     </div>
   )

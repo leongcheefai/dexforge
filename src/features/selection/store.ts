@@ -37,9 +37,12 @@ interface SelectionState {
   preset: GenerationPreset
   fromId: number
   toId: number
+  isGenerated: boolean
   setPreset: (preset: GenerationPreset) => void
   setFromId: (id: number) => void
   setToId: (id: number) => void
+  generate: () => void
+  resetGenerated: () => void
 }
 
 export const useSelectionStore = create<SelectionState>()(
@@ -48,16 +51,19 @@ export const useSelectionStore = create<SelectionState>()(
       preset: 'gen1',
       fromId: 1,
       toId: 151,
+      isGenerated: false,
       setPreset: (preset) => {
         if (preset === 'custom') {
-          set({ preset })
+          set({ preset, isGenerated: false })
         } else {
           const { from, to } = GENERATION_PRESETS[preset]
-          set({ preset, fromId: from, toId: to })
+          set({ preset, fromId: from, toId: to, isGenerated: false })
         }
       },
-      setFromId: (fromId) => set({ fromId, preset: 'custom' }),
-      setToId: (toId) => set({ toId, preset: 'custom' }),
+      setFromId: (fromId) => set({ fromId, preset: 'custom', isGenerated: false }),
+      setToId: (toId) => set({ toId, preset: 'custom', isGenerated: false }),
+      generate: () => set({ isGenerated: true }),
+      resetGenerated: () => set({ isGenerated: false }),
     }),
     { name: 'pocketpages-selection' },
   ),
