@@ -65,6 +65,14 @@ body {
   @page {
     size: A4 portrait;
     margin: 10mm;
+    margin-top: 15mm;
+
+    @top-left { content: none; }
+    @top-center { content: none; }
+    @top-right { content: none; }
+    @bottom-left { content: none; }
+    @bottom-center { content: none; }
+    @bottom-right { content: none; }
   }
 
   body {
@@ -79,5 +87,15 @@ body {
 
   #print-sheet {
     display: block !important;
+  }
+
+  #print-title {
+    display: block !important;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    margin-bottom: 6mm;
+    color: #000;
   }
 }
