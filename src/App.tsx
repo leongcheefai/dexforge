@@ -1,6 +1,13 @@
+import { useState } from 'react'
 import { Download } from 'lucide-react'
 import { Toaster } from '@/components/ui/sonner'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { CardSettingsPanel } from '@/features/customization/CardSettingsPanel'
 import { PreviewCanvas } from '@/features/preview/PreviewCanvas'
 import { PrintSheet } from '@/features/export/PrintSheet'
@@ -9,6 +16,7 @@ import { useSelectionStore } from '@/features/selection/store'
 export default function App() {
   const { isGenerated, isPrefetching } = useSelectionStore()
   const printDisabled = !isGenerated || isPrefetching
+  const [supportOpen, setSupportOpen] = useState(false)
 
   return (
     <>
@@ -33,6 +41,14 @@ export default function App() {
             <span className="text-[10px] tracking-widest text-muted-foreground uppercase hidden sm:block" style={{ fontFamily: "'DM Mono', monospace" }}>
               ⌘P to print
             </span>
+            <button
+              onClick={() => setSupportOpen(true)}
+              aria-label="Support PaperDex"
+              className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg px-4 h-8 text-black font-semibold text-[11px] uppercase tracking-widest border border-black focus:outline-none"
+              style={{ background: '#FFDD00' }}
+            >
+              ☕ support
+            </button>
             <Button
               onClick={() => window.print()}
               disabled={printDisabled}
@@ -54,6 +70,34 @@ export default function App() {
           </main>
         </div>
       </div>
+
+      <Dialog open={supportOpen} onOpenChange={setSupportOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold">Support PaperDex ❤️</DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Thank you so much for using PaperDex! This tool is completely free and I maintain it in
+            my spare time. If it's been useful to you, any support is genuinely appreciated — it
+            helps keep the project going. 🙏
+          </p>
+
+          <a
+            href="https://www.buymeacoffee.com/cheefai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full rounded-md font-semibold text-sm py-3 text-black"
+            style={{ background: '#FFDD00' }}
+          >
+            ☕ Buy Me a Coffee
+          </a>
+
+          <Button variant="ghost" size="sm" className="w-full" onClick={() => setSupportOpen(false)}>
+            Close
+          </Button>
+        </DialogContent>
+      </Dialog>
 
       <PrintSheet />
       <Toaster />
