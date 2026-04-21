@@ -61,8 +61,14 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- UI fonts: optional prevents FOUT-driven layout shift; system fallback is acceptable -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Geist:wght@400;500;700&family=Lobster&family=Merriweather:wght@400;700&family=Roboto:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=optional"
+      rel="stylesheet"
+    />
+    <!-- Card preview fonts: fallback gives 100 ms to load before using system font, then swaps once -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Lobster&family=Merriweather:wght@400;700&family=Roboto:wght@400;500;700&family=Space+Mono:wght@400;700&display=fallback"
       rel="stylesheet"
     />
   </head>
