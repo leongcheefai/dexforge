@@ -68,6 +68,85 @@
   </head>
   <body>
     <div id="root"></div>
+    <footer id="site-footer" style="border-top:1px solid #e5e7eb;background:#fafafa;color:#6b7280;font-size:12px;line-height:1.6;padding:2rem 1.5rem;">
+      <div style="max-width:56rem;margin:0 auto;display:grid;gap:1.5rem;">
+        <div>
+          <h2 style="font-size:14px;font-weight:600;color:#111827;margin:0 0 0.5rem">About PaperDex</h2>
+          <p style="margin:0">
+            PaperDex is a free, browser-based tool for generating printable Pokémon binder
+            placeholder PDFs. Collectors use it to fill empty slots in their Pokémon card binders
+            with custom-designed placeholders while they search for the real cards. No account or
+            installation is required — everything runs directly in your browser and your data stays
+            on your device.
+          </p>
+        </div>
+
+        <div style="display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr))">
+          <div>
+            <h3 style="font-size:13px;font-weight:600;color:#111827;margin:0 0 0.5rem">How It Works</h3>
+            <p style="margin:0">
+              Select Pokémon by generation preset, name search, or Pokédex number range. Choose
+              from seven sprite styles including Gen 1–9 pixel art and official artwork. Customize
+              the card border color, background gradient, font family, and whether to show the
+              Pokédex number. The live 3×3 page preview updates in real time. When you are ready,
+              export a print-ready PDF or use your browser's built-in print dialog to send it
+              straight to your printer.
+            </p>
+          </div>
+
+          <div>
+            <h3 style="font-size:13px;font-weight:600;color:#111827;margin:0 0 0.5rem">Features</h3>
+            <ul style="margin:0;padding-left:1.25rem">
+              <li>All 1,000+ Pokémon supported via PokéAPI</li>
+              <li>Seven sprite styles: default, shiny, female, Gen 1–9 pixel art</li>
+              <li>Multi-language Pokémon names</li>
+              <li>Custom border styles, colors, and card fonts</li>
+              <li>Pokédex number toggle and gradient backgrounds</li>
+              <li>Generation presets for instant selection</li>
+              <li>Sprites cached locally for fast repeat use</li>
+              <li>No login, no ads, completely free</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 style="font-size:13px;font-weight:600;color:#111827;margin:0 0 0.5rem">Who Is It For?</h3>
+            <p style="margin:0">
+              PaperDex is built for Pokémon TCG collectors who want neat, consistent placeholders
+              in their card binders. Whether you are building a living Pokédex binder, organizing
+              sets by generation, or simply keeping track of missing cards, PaperDex lets you print
+              professional-looking placeholder cards in minutes. It is equally useful for teachers
+              and parents who want to create printable Pokémon activity sheets for kids.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-size:13px;font-weight:600;color:#111827;margin:0 0 0.75rem">Frequently Asked Questions</h3>
+          <dl style="margin:0;display:grid;gap:0.75rem;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr))">
+            <div>
+              <dt style="font-weight:600;color:#374151">Is PaperDex free to use?</dt>
+              <dd style="margin:0">Yes. PaperDex is completely free with no hidden costs, no account required, and no watermarks on exported PDFs.</dd>
+            </div>
+            <div>
+              <dt style="font-weight:600;color:#374151">Which Pokémon are supported?</dt>
+              <dd style="margin:0">All Pokémon from Generation 1 through Generation 9 are supported, covering all 1,000+ species from Bulbasaur to Pecharunt.</dd>
+            </div>
+            <div>
+              <dt style="font-weight:600;color:#374151">Can I customize the card design?</dt>
+              <dd style="margin:0">Yes. You can change the border color, background gradient, font, sprite style, and toggle the Pokédex number on or off for each batch.</dd>
+            </div>
+            <div>
+              <dt style="font-weight:600;color:#374151">Does it work offline?</dt>
+              <dd style="margin:0">Once sprites and Pokémon names are loaded for the first time, they are cached in your browser so subsequent sessions work without a network connection.</dd>
+            </div>
+          </dl>
+        </div>
+
+        <p style="margin:0;padding-top:0.75rem;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af">
+          PaperDex is a fan-made tool. Pokémon and all related names are trademarks of Nintendo, Game Freak, and Creatures Inc. Sprites are sourced from the open PokeAPI sprites repository.
+        </p>
+      </div>
+    </footer>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
