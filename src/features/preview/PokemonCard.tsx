@@ -1,27 +1,11 @@
-import { useState, useEffect } from 'react'
+import { memo, useState, useEffect } from 'react'
 import { useCardSettingsStore, spriteUrl } from '@/features/customization/store'
 import { useSelectionStore } from '@/features/selection/store'
 import { typeColor } from '@/lib/pokemon-types'
 import { loadSprite, getCachedBlobUrl } from '@/lib/sprite-cache'
+import { getCachedPokemon, fetchPokemonData } from '@/lib/pokemon-data-cache'
 
-const pokemonCache = new Map<number, { name: string; types: string[] }>()
-
-async function fetchPokemonData(id: number): Promise<void> {
-  if (pokemonCache.has(id)) return
-  try {
-    const data = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then((r) => r.json())
-    const raw: string = data.name ?? ''
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pokemonCache.set(id, { name: raw.charAt(0).toUpperCase() + raw.slice(1), types: (data.types ?? []).map((t: any) => t.type.name as string) })
-  } catch { /* ignore */ }
-}
-
-export async function prefetchRange(from: number, to: number, concurrency = 12): Promise<void> {
-  const ids = Array.from({ length: to - from + 1 }, (_, i) => from + i).filter((id) => !pokemonCache.has(id))
-  for (let i = 0; i < ids.length; i += concurrency) {
-    await Promise.all(ids.slice(i, i + concurrency).map(fetchPokemonData))
-  }
-}
+export { prefetchRange } from '@/lib/pokemon-data-cache'
 
 const FONT_FAMILIES = [
   'Inter', 'Geist', 'Roboto', 'Merriweather', 'Space Mono', 'Lobster',
@@ -47,7 +31,7 @@ interface PokemonCardProps {
   mini?: boolean
 }
 
-export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
+export const PokemonCard = memo(function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
   const { borderStyle, borderColor, backgroundColor, fontFamily, showName, showNumber, showTypeBadges, imageStyle } =
     useCardSettingsStore()
   const { fromId } = useSelectionStore()
@@ -56,8 +40,8 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
   const rawUrl = spriteUrl(id, imageStyle)
   const [blobUrl, setBlobUrl] = useState<string | null>(() => rawUrl ? (getCachedBlobUrl(rawUrl) ?? null) : null)
   const [loaded, setLoaded] = useState(() => rawUrl ? !!getCachedBlobUrl(rawUrl) : false)
-  const [name, setName] = useState<string | null>(() => pokemonCache.get(id)?.name ?? null)
-  const [types, setTypes] = useState<string[]>(() => pokemonCache.get(id)?.types ?? [])
+  const [name, setName] = useState<string | null>(() => getCachedPokemon(id)?.name ?? null)
+  const [types, setTypes] = useState<string[]>(() => getCachedPokemon(id)?.types ?? [])
   const url = blobUrl ?? rawUrl
 
   useEffect(() => {
@@ -85,7 +69,7 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
   }, [rawUrl])
 
   useEffect(() => {
-    const cached = pokemonCache.get(id)
+    const cached = getCachedPokemon(id)
     if (cached) {
       setName(cached.name)
       setTypes(cached.types)
@@ -94,22 +78,14 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
     setName(null)
     setTypes([])
     let cancelled = false
-    setName(null)
-    setTypes([])
-    fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!cancelled) {
-          const raw: string = data.name ?? ''
-          const name = raw.charAt(0).toUpperCase() + raw.slice(1)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const types = (data.types ?? []).map((t: any) => t.type.name as string)
-          pokemonCache.set(id, { name, types })
-          setName(name)
-          setTypes(types)
-        }
-      })
-      .catch(() => {})
+    fetchPokemonData(id).then(() => {
+      if (cancelled) return
+      const data = getCachedPokemon(id)
+      if (data) {
+        setName(data.name)
+        setTypes(data.types)
+      }
+    }).catch(() => {})
     return () => { cancelled = true }
   }, [id])
 
@@ -164,4 +140,4 @@ export function PokemonCard({ mini = false, pokemonId }: PokemonCardProps) {
       </div>
     </div>
   )
-}
+})

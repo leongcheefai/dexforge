@@ -1,13 +1,80 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PokemonCard, prefetchRange } from './PokemonCard'
 import { PageThumbnail } from './PageThumbnail'
 import { useSelectionStore } from '@/features/selection/store'
 
 const CARDS_PER_PAGE = 9
+const EAGER_PAGES = 3
+const PAGE_PLACEHOLDER_HEIGHT = 680
+
+interface VirtualPageProps {
+  pageIds: number[]
+  pageIdx: number
+  totalPages: number
+  eager: boolean
+}
+
+function VirtualPage({ pageIds, pageIdx, totalPages, eager }: VirtualPageProps) {
+  const [visible, setVisible] = useState(eager)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (visible) return
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '600px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [visible])
+
+  return (
+    <div
+      ref={ref}
+      className="flex flex-col items-center gap-3"
+      style={{ minHeight: visible ? undefined : PAGE_PLACEHOLDER_HEIGHT }}
+    >
+      {visible && (
+        <>
+          <div
+            className="grid grid-cols-3 gap-2 bg-white shadow-md"
+            style={{ width: '480px', padding: '24px' }}
+          >
+            {pageIds.map((id) => (
+              <div key={id} style={{ width: '136px' }}>
+                <PokemonCard pokemonId={id} />
+              </div>
+            ))}
+            {pageIds.length < CARDS_PER_PAGE &&
+              Array.from({ length: CARDS_PER_PAGE - pageIds.length }, (_, i) => (
+                <div
+                  key={`empty-${i}`}
+                  className="border border-dashed border-muted-foreground/30"
+                  style={{ aspectRatio: '63/88', width: '136px' }}
+                />
+              ))}
+          </div>
+          <span
+            className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            style={{ fontFamily: "'DM Mono', monospace" }}
+          >
+            Page {pageIdx + 1} / {totalPages}
+          </span>
+        </>
+      )}
+    </div>
+  )
+}
 
 export function PreviewCanvas() {
   const { isGenerated, fromId, toId } = useSelectionStore()
-
   const setIsPrefetching = useSelectionStore((s) => s.setIsPrefetching)
 
   useEffect(() => {
@@ -26,32 +93,13 @@ export function PreviewCanvas() {
     return (
       <div className="flex w-full flex-col items-center gap-10 overflow-y-auto py-10 px-8">
         {pages.map((pageIds, pageIdx) => (
-          <div key={pageIdx} className="flex flex-col items-center gap-3">
-            <div
-              className="grid grid-cols-3 gap-2 bg-white shadow-md"
-              style={{ width: '480px', padding: '24px' }}
-            >
-              {pageIds.map((id) => (
-                <div key={id} style={{ width: '136px' }}>
-                  <PokemonCard pokemonId={id} />
-                </div>
-              ))}
-              {pageIds.length < CARDS_PER_PAGE &&
-                Array.from({ length: CARDS_PER_PAGE - pageIds.length }, (_, i) => (
-                  <div
-                    key={`empty-${i}`}
-                    className="border border-dashed border-muted-foreground/30"
-                    style={{ aspectRatio: '63/88', width: '136px' }}
-                  />
-                ))}
-            </div>
-            <span
-              className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
-              style={{ fontFamily: "'DM Mono', monospace" }}
-            >
-              Page {pageIdx + 1} / {pages.length}
-            </span>
-          </div>
+          <VirtualPage
+            key={pageIdx}
+            pageIds={pageIds}
+            pageIdx={pageIdx}
+            totalPages={pages.length}
+            eager={pageIdx < EAGER_PAGES}
+          />
         ))}
       </div>
     )
