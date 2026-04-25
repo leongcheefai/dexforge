@@ -29,13 +29,17 @@ export function NavSearch() {
   const [query, setQuery] = useState('')
   const [items, setItems] = useState<PokemonNameEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const { setFromId, setToId } = useSelectionStore()
 
   useEffect(() => {
     loadPokemonNameList()
       .then(setItems)
-      .catch((err) => console.error('[NavSearch] Failed to load Pokémon list', err))
+      .catch((err) => {
+        console.error('[NavSearch] Failed to load Pokémon list', err)
+        setError(true)
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -50,14 +54,15 @@ export function NavSearch() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
+  const q = query.trim().toLowerCase()
   const filtered =
-    query.trim() === ''
+    q === ''
       ? items.slice(0, 50)
       : items
           .filter(
             (p) =>
-              p.name.includes(query.toLowerCase()) ||
-              String(p.id).includes(query.trim())
+              p.name.includes(q) ||
+              String(p.id).includes(q)
           )
           .slice(0, 50)
 
@@ -111,6 +116,8 @@ export function NavSearch() {
         <ul className="max-h-64 overflow-y-auto py-1" role="menu">
           {loading ? (
             <li className="px-3 py-2 text-sm text-muted-foreground">Loading…</li>
+          ) : error ? (
+            <li className="px-3 py-2 text-sm text-muted-foreground">Failed to load — check your connection</li>
           ) : filtered.length === 0 ? (
             <li className="px-3 py-2 text-sm text-muted-foreground">No results</li>
           ) : (
