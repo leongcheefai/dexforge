@@ -89,12 +89,9 @@ export function NavSearch() {
         >
           <Search className="h-3.5 w-3.5 shrink-0" />
           <span className="hidden sm:block">Search Pokémon…</span>
-          <span
-            className="hidden sm:block text-[10px] tracking-widest text-muted-foreground/60"
-            style={{ fontFamily: "'DM Mono', monospace" }}
-          >
+          <kbd className="hidden sm:inline-flex items-center rounded border border-border px-1 py-0.5 text-[10px] leading-none text-muted-foreground/60" style={{ fontFamily: "'DM Mono', monospace" }}>
             {hint}
-          </span>
+          </kbd>
         </button>
       </PopoverTrigger>
       <PopoverContent
