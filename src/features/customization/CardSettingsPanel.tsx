@@ -14,6 +14,8 @@ import type { CardSettings, ImageStyle } from './store'
 import { useDebounce } from '@/lib/useDebounce'
 import { useSelectionStore, GENERATION_PRESETS } from '@/features/selection/store'
 import type { GenerationPreset } from '@/features/selection/store'
+import { Layers, Image as ImageLucide, Square, Palette, Type, Eye, LayoutGrid, Plus, Minus } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const MONO = { fontFamily: "'DM Mono', monospace" }
 
@@ -33,11 +35,14 @@ const BORDER_STYLES: { value: CardSettings['borderStyle']; label: string }[] = [
   { value: 'none', label: 'None' },
 ]
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) {
   return (
-    <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mb-3" style={MONO}>
-      {children}
-    </p>
+    <div className="flex items-center gap-2 mb-3">
+      <Icon className="h-3 w-3 text-primary/50 shrink-0" strokeWidth={2.5} />
+      <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground" style={MONO}>
+        {children}
+      </p>
+    </div>
   )
 }
 
@@ -45,6 +50,85 @@ function Section({ children }: { children: React.ReactNode }) {
   return (
     <div className="px-5 py-4 border-b border-border">
       {children}
+    </div>
+  )
+}
+
+function ColorPickerRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-foreground/70">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] text-muted-foreground/50 tabular-nums" style={MONO}>
+          {value.toUpperCase()}
+        </span>
+        <label className="cursor-pointer group relative">
+          <input
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="sr-only"
+          />
+          <div
+            className="h-7 w-7 rounded-md border-2 border-border/60 ring-offset-background group-focus-within:ring-2 group-focus-within:ring-ring group-focus-within:ring-offset-1 transition-all hover:border-primary/50 hover:scale-105 active:scale-95"
+            style={{ backgroundColor: value }}
+          />
+        </label>
+      </div>
+    </div>
+  )
+}
+
+function NumberStepper({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string
+  value: number
+  min: number
+  max: number
+  onChange: (v: number) => void
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
+        {label}
+      </span>
+      <div className="flex items-stretch rounded-md border border-input overflow-hidden">
+        <button
+          type="button"
+          onClick={() => onChange(Math.max(min, value - 1))}
+          className="px-2.5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors border-r border-input shrink-0"
+        >
+          <Minus className="h-2.5 w-2.5" />
+        </button>
+        <input
+          type="number"
+          min={min}
+          max={max}
+          value={value}
+          onChange={(e) => onChange(Math.max(min, Math.min(max, parseInt(e.target.value) || min)))}
+          className="flex-1 min-w-0 bg-input/60 px-2 py-2 text-sm text-foreground text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+        <button
+          type="button"
+          onClick={() => onChange(Math.min(max, value + 1))}
+          className="px-2.5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors border-l border-input shrink-0"
+        >
+          <Plus className="h-2.5 w-2.5" />
+        </button>
+      </div>
     </div>
   )
 }
@@ -59,10 +143,11 @@ const PRESET_OPTIONS: { value: GenerationPreset; label: string }[] = [
 
 function RangeSection() {
   const { preset, fromId, toId, setPreset, setFromId, setToId } = useSelectionStore()
+  const count = toId - fromId + 1
 
   return (
     <Section>
-      <SectionLabel>Pokémon Range</SectionLabel>
+      <SectionLabel icon={Layers}>Pokémon Range</SectionLabel>
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
           <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
@@ -80,32 +165,26 @@ function RangeSection() {
           </Select>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
-              From #
-            </span>
-            <input
-              type="number"
-              min={1}
-              max={toId}
-              value={fromId}
-              onChange={(e) => setFromId(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
-              To #
-            </span>
-            <input
-              type="number"
-              min={fromId}
-              max={1025}
-              value={toId}
-              onChange={(e) => setToId(Math.min(1025, parseInt(e.target.value) || 1))}
-              className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
-            />
-          </div>
+          <NumberStepper
+            label="From #"
+            value={fromId}
+            min={1}
+            max={toId}
+            onChange={setFromId}
+          />
+          <NumberStepper
+            label="To #"
+            value={toId}
+            min={fromId}
+            max={1025}
+            onChange={setToId}
+          />
+        </div>
+        <div className="flex items-center justify-center py-1.5 rounded-md bg-muted/30 border border-border/40">
+          <span className="text-[11px] text-muted-foreground" style={MONO}>
+            <span className="text-foreground font-medium">{count}</span>
+            {' '}Pokémon · {Math.ceil(count / 9)} page{count !== 9 ? 's' : ''}
+          </span>
         </div>
       </div>
     </Section>
@@ -130,6 +209,12 @@ export function CardSettingsPanel() {
     useCardSettingsStore.getState().setBackgroundColor(debouncedBgColor)
   }, [debouncedBgColor])
 
+  const count = toId - fromId + 1
+  const rangeLabel =
+    fromId === toId
+      ? `#${String(fromId).padStart(3, '0')}`
+      : `#${String(fromId).padStart(3, '0')}–#${String(toId).padStart(3, '0')}`
+
   return (
     <div className="flex flex-col h-full">
       <div className="px-5 py-4 border-b border-border">
@@ -142,7 +227,7 @@ export function CardSettingsPanel() {
         <RangeSection />
 
         <Section>
-          <SectionLabel>Image Style</SectionLabel>
+          <SectionLabel icon={ImageLucide}>Image Style</SectionLabel>
           <Select value={store.imageStyle} onValueChange={(v: string) => store.setImageStyle(v as ImageStyle)}>
             <SelectTrigger className="w-full">
               <SelectValue />
@@ -156,136 +241,155 @@ export function CardSettingsPanel() {
         </Section>
 
         <Section>
-          <SectionLabel>Border</SectionLabel>
+          <SectionLabel icon={Square}>Border</SectionLabel>
           <div className="flex flex-col gap-3">
             <div className="grid grid-cols-4 gap-1.5">
               {BORDER_STYLES.map(({ value, label }) => (
                 <button
                   key={value}
                   onClick={() => store.setBorderStyle(value)}
-                  className={`rounded-md py-1.5 text-[11px] font-medium tracking-wide transition-all duration-150 ${
+                  className={`flex flex-col items-center gap-2 pt-2.5 pb-2 px-1 rounded-md transition-all duration-150 ${
                     store.borderStyle === value
-                      ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
-                      : 'bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-secondary'
+                      ? 'bg-primary/10 ring-1 ring-primary/50'
+                      : 'bg-muted/40 hover:bg-muted/70'
                   }`}
                 >
-                  {label}
+                  {value === 'none' ? (
+                    <div className="w-6 h-4 flex items-center justify-center">
+                      <div className="w-4 h-px bg-muted-foreground/30" />
+                    </div>
+                  ) : (
+                    <div
+                      className={`w-6 h-4 ${
+                        value === 'dashed'
+                          ? 'border-dashed'
+                          : 'border-solid'
+                      } ${value === 'rounded' ? 'rounded-sm' : ''} border-[1.5px] ${
+                        store.borderStyle === value
+                          ? 'border-primary'
+                          : 'border-muted-foreground/50'
+                      }`}
+                    />
+                  )}
+                  <span
+                    className={`text-[9px] uppercase tracking-wide font-medium ${
+                      store.borderStyle === value ? 'text-primary' : 'text-muted-foreground'
+                    }`}
+                    style={MONO}
+                  >
+                    {label}
+                  </span>
                 </button>
               ))}
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-foreground/70">Color</span>
-              <label className="cursor-pointer group relative">
-                <input
-                  type="color"
-                  value={borderColorDraft}
-                  onChange={(e) => setBorderColorDraft(e.target.value)}
-                  className="sr-only"
-                />
-                <div
-                  className="h-8 w-8 rounded-md border-2 border-border/60 ring-offset-background group-focus-within:ring-2 group-focus-within:ring-ring group-focus-within:ring-offset-2 transition-all hover:border-primary/50"
-                  style={{ backgroundColor: borderColorDraft }}
-                />
-              </label>
-            </div>
+            <ColorPickerRow
+              label="Color"
+              value={borderColorDraft}
+              onChange={setBorderColorDraft}
+            />
           </div>
         </Section>
 
         <Section>
-          <SectionLabel>Background</SectionLabel>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-foreground/70">Color</span>
-            <label className="cursor-pointer group relative">
-              <input
-                type="color"
-                value={bgColorDraft}
-                onChange={(e) => setBgColorDraft(e.target.value)}
-                className="sr-only"
-              />
-              <div
-                className="h-8 w-8 rounded-md border-2 border-border/60 ring-offset-background group-focus-within:ring-2 group-focus-within:ring-ring group-focus-within:ring-offset-2 transition-all hover:border-primary/50"
-                style={{ backgroundColor: bgColorDraft }}
-              />
-            </label>
-          </div>
+          <SectionLabel icon={Palette}>Background</SectionLabel>
+          <ColorPickerRow
+            label="Color"
+            value={bgColorDraft}
+            onChange={setBgColorDraft}
+          />
         </Section>
 
         <Section>
-          <SectionLabel>Typography</SectionLabel>
+          <SectionLabel icon={Type}>Typography</SectionLabel>
           <Select value={store.fontFamily} onValueChange={(v: string) => store.setFontFamily(v)}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {FONT_FAMILIES.map((f) => (
-                <SelectItem key={f} value={f} style={{ fontFamily: f }}>{f}</SelectItem>
+                <SelectItem key={f} value={f} style={{ fontFamily: f }}>
+                  {f}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </Section>
 
         <Section>
-          <SectionLabel>Display</SectionLabel>
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="show-name" className="text-sm text-foreground/70 cursor-pointer font-normal">
-                Show Name
-              </Label>
-              <Switch
-                id="show-name"
-                checked={store.showName}
-                onCheckedChange={store.setShowName}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="show-number" className="text-sm text-foreground/70 cursor-pointer font-normal">
-                Show Number
-              </Label>
-              <Switch
-                id="show-number"
-                checked={store.showNumber}
-                onCheckedChange={store.setShowNumber}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="show-type-badges" className="text-sm text-foreground/70 cursor-pointer font-normal">
-                Show Type Badges
-              </Label>
-              <Switch
-                id="show-type-badges"
-                checked={store.showTypeBadges}
-                onCheckedChange={store.setShowTypeBadges}
-              />
-            </div>
+          <SectionLabel icon={Eye}>Display</SectionLabel>
+          <div className="flex flex-col divide-y divide-border/40">
+            {[
+              { id: 'show-name', label: 'Show Name', checked: store.showName, onChange: store.setShowName },
+              { id: 'show-number', label: 'Show Number', checked: store.showNumber, onChange: store.setShowNumber },
+              { id: 'show-type-badges', label: 'Show Type Badges', checked: store.showTypeBadges, onChange: store.setShowTypeBadges },
+            ].map(({ id, label, checked, onChange }) => (
+              <div key={id} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
+                <Label
+                  htmlFor={id}
+                  className="text-sm text-foreground/70 cursor-pointer font-normal"
+                >
+                  {label}
+                </Label>
+                <Switch id={id} checked={checked} onCheckedChange={onChange} />
+              </div>
+            ))}
           </div>
         </Section>
 
         <Section>
-          <SectionLabel>Layout</SectionLabel>
+          <SectionLabel icon={LayoutGrid}>Layout</SectionLabel>
           <div className="flex flex-col gap-1.5">
             <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
               Grid Gap (mm)
             </span>
-            <input
-              type="number"
-              min={0}
-              max={20}
-              step={1}
-              value={store.gridGap}
-              onChange={(e) => store.setGridGap(Math.max(0, Math.min(20, parseFloat(e.target.value) || 0)))}
-              className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
-            />
+            <div className="flex items-stretch rounded-md border border-input overflow-hidden">
+              <button
+                type="button"
+                onClick={() => store.setGridGap(Math.max(0, store.gridGap - 1))}
+                className="px-2.5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors border-r border-input shrink-0"
+              >
+                <Minus className="h-2.5 w-2.5" />
+              </button>
+              <input
+                type="number"
+                min={0}
+                max={20}
+                step={1}
+                value={store.gridGap}
+                onChange={(e) =>
+                  store.setGridGap(Math.max(0, Math.min(20, parseFloat(e.target.value) || 0)))
+                }
+                className="flex-1 min-w-0 bg-input/60 px-2 py-2 text-sm text-foreground text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+              <button
+                type="button"
+                onClick={() => store.setGridGap(Math.min(20, store.gridGap + 1))}
+                className="px-2.5 bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors border-l border-input shrink-0"
+              >
+                <Plus className="h-2.5 w-2.5" />
+              </button>
+            </div>
           </div>
         </Section>
       </div>
 
       <div className="px-5 py-4 border-t border-border shrink-0">
-        <Button
-          className="w-full uppercase tracking-widest text-[11px] font-semibold h-9"
-          onClick={generate}
-        >
-          Generate #{String(fromId).padStart(3, '0')}–#{String(toId).padStart(3, '0')}
-        </Button>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between px-0.5">
+            <span className="text-[10px] text-muted-foreground/50" style={MONO}>
+              {count} Pokémon · {Math.ceil(count / 9)} page{count !== 9 ? 's' : ''}
+            </span>
+            <span className="text-[10px] text-muted-foreground/50" style={MONO}>
+              {rangeLabel}
+            </span>
+          </div>
+          <Button
+            className="w-full uppercase tracking-widest text-[11px] font-semibold h-9"
+            onClick={generate}
+          >
+            Generate {rangeLabel}
+          </Button>
+        </div>
       </div>
     </div>
   )
