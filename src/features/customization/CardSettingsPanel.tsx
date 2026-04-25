@@ -259,6 +259,24 @@ export function CardSettingsPanel() {
             </div>
           </div>
         </Section>
+
+        <Section>
+          <SectionLabel>Layout</SectionLabel>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground" style={MONO}>
+              Grid Gap (mm)
+            </span>
+            <input
+              type="number"
+              min={0}
+              max={20}
+              step={1}
+              value={store.gridGap}
+              onChange={(e) => store.setGridGap(Math.max(0, Math.min(20, parseFloat(e.target.value) || 0)))}
+              className="w-full rounded-md border border-input bg-input/60 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-background focus:ring-offset-1"
+            />
+          </div>
+        </Section>
       </div>
 
       <div className="px-5 py-4 border-t border-border shrink-0">

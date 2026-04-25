@@ -1,10 +1,12 @@
 import { useSelectionStore } from '@/features/selection/store'
+import { useCardSettingsStore } from '@/features/customization/store'
 import { PokemonCard } from '@/features/preview/PokemonCard'
 
 const CARDS_PER_PAGE = 9
 
 export function PrintSheet() {
   const { fromId, toId, isGenerated, isPrefetching } = useSelectionStore()
+  const gridGap = useCardSettingsStore((s) => s.gridGap)
   const ready = isGenerated && !isPrefetching
 
   const ids = ready ? Array.from({ length: toId - fromId + 1 }, (_, i) => fromId + i) : []
@@ -22,7 +24,7 @@ export function PrintSheet() {
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 63mm)',
             gridTemplateRows: 'repeat(3, 88mm)',
-            gap: '2mm',
+            gap: `${gridGap}mm`,
             pageBreakAfter: pageIdx < pages.length - 1 ? 'always' : 'avoid',
             width: 'fit-content',
           }}

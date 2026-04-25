@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { PokemonCard, prefetchRange } from './PokemonCard'
 import { PageThumbnail } from './PageThumbnail'
 import { useSelectionStore } from '@/features/selection/store'
+import { useCardSettingsStore } from '@/features/customization/store'
 
 const CARDS_PER_PAGE = 9
 const EAGER_PAGES = 3
@@ -14,9 +15,13 @@ interface VirtualPageProps {
   eager: boolean
 }
 
+const PREVIEW_PX_PER_MM = 136 / 63
+
 function VirtualPage({ pageIds, pageIdx, totalPages, eager }: VirtualPageProps) {
   const [visible, setVisible] = useState(eager)
   const ref = useRef<HTMLDivElement>(null)
+  const gridGap = useCardSettingsStore((s) => s.gridGap)
+  const gapPx = Math.round(gridGap * PREVIEW_PX_PER_MM)
 
   useEffect(() => {
     if (visible) return
@@ -44,8 +49,13 @@ function VirtualPage({ pageIds, pageIdx, totalPages, eager }: VirtualPageProps) 
       {visible && (
         <>
           <div
-            className="grid grid-cols-3 gap-2 bg-white shadow-md"
-            style={{ width: '480px', padding: '24px' }}
+            className="bg-white shadow-md"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(3, 136px)`,
+              padding: '24px',
+              gap: `${gapPx}px`,
+            }}
           >
             {pageIds.map((id) => (
               <div key={id} style={{ width: '136px' }}>

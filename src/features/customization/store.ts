@@ -32,6 +32,7 @@ export interface CardSettings {
   showNumber: boolean
   showTypeBadges: boolean
   imageStyle: ImageStyle
+  gridGap: number
 }
 
 interface CardSettingsStore extends CardSettings {
@@ -43,6 +44,7 @@ interface CardSettingsStore extends CardSettings {
   setShowNumber: (v: boolean) => void
   setShowTypeBadges: (v: boolean) => void
   setImageStyle: (v: ImageStyle) => void
+  setGridGap: (v: number) => void
 }
 
 export const useCardSettingsStore = create<CardSettingsStore>((set) => ({
@@ -54,6 +56,7 @@ export const useCardSettingsStore = create<CardSettingsStore>((set) => ({
   showNumber: true,
   showTypeBadges: true,
   imageStyle: 'pixels',
+  gridGap: 2,
   setBorderStyle: (v) => set({ borderStyle: v }),
   setBorderColor: (v) => set({ borderColor: v }),
   setBackgroundColor: (v) => set({ backgroundColor: v }),
@@ -62,4 +65,5 @@ export const useCardSettingsStore = create<CardSettingsStore>((set) => ({
   setShowNumber: (v) => set({ showNumber: v }),
   setShowTypeBadges: (v) => set({ showTypeBadges: v }),
   setImageStyle: (v) => set({ imageStyle: v }),
+  setGridGap: (v) => set({ gridGap: v }),
 }))
