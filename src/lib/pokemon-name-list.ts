@@ -9,7 +9,10 @@ export async function loadPokemonNameList(): Promise<PokemonNameEntry[]> {
   if (cached) return cached
 
   const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025&offset=0')
+  if (!res.ok) throw new Error(`PokeAPI list fetch failed: ${res.status}`)
+
   const data = (await res.json()) as { results: { name: string; url: string }[] }
+  if (!Array.isArray(data.results)) throw new Error('Unexpected PokeAPI response shape')
 
   const entries: PokemonNameEntry[] = data.results
     .map(({ name, url }) => ({
