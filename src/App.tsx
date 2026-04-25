@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { NavSearch } from '@/features/selection/NavSearch'
 import { CardSettingsPanel } from '@/features/customization/CardSettingsPanel'
 import { PreviewCanvas } from '@/features/preview/PreviewCanvas'
 import { PrintSheet } from '@/features/export/PrintSheet'
@@ -23,13 +24,13 @@ export default function App() {
     <>
       <div id="app-shell" className="min-h-screen bg-background text-foreground">
         <header
-          className="h-16 flex items-center justify-between px-6 shrink-0 border-b border-border"
+          className="h-16 flex items-center gap-4 px-6 shrink-0 border-b border-border"
           style={{
             background: 'linear-gradient(to bottom, oklch(1 0 0), oklch(0.97 0.006 22))',
             boxShadow: '0 1px 0 oklch(0.52 0.22 25 / 0.18)',
           }}
         >
-          <h1 className="flex items-center gap-0.5 m-0" style={{ fontFamily: "'Cinzel', serif" }}>
+          <h1 className="flex items-center gap-0.5 m-0 shrink-0" style={{ fontFamily: "'Cinzel', serif" }}>
             <span className="text-base font-semibold tracking-[0.18em] text-primary">
               PAPER
             </span>
@@ -37,6 +38,10 @@ export default function App() {
               DEX
             </span>
           </h1>
+
+          <NavSearch />
+
+          <div className="flex-1" />
 
           <div className="flex items-center gap-3">
             <span className="text-[10px] tracking-widest text-muted-foreground uppercase hidden sm:block" style={{ fontFamily: "'DM Mono', monospace" }}>
