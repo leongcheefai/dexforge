@@ -14,37 +14,41 @@ function formatName(name: string) {
 }
 
 const isMac =
-  typeof navigator !== 'undefined' && /mac/i.test(navigator.platform)
+  typeof navigator !== 'undefined' &&
+  (
+    (
+      (navigator as Navigator & { userAgentData?: { platform?: string } })
+        .userAgentData?.platform ?? navigator.platform
+    ) ?? ''
+  )
+    .toLowerCase()
+    .startsWith('mac')
 
 export function NavSearch() {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [items, setItems] = useState<PokemonNameEntry[]>([])
+  const [loading, setLoading] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
   const { setFromId, setToId } = useSelectionStore()
 
   useEffect(() => {
-    loadPokemonNameList().then(setItems)
+    loadPokemonNameList()
+      .then(setItems)
+      .catch((err) => console.error('[NavSearch] Failed to load Pokémon list', err))
+      .finally(() => setLoading(false))
   }, [])
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setOpen(true)
+        setOpen((prev) => !prev)
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
-
-  useEffect(() => {
-    if (open) {
-      requestAnimationFrame(() => inputRef.current?.focus())
-    } else {
-      setQuery('')
-    }
-  }, [open])
 
   const filtered =
     query.trim() === ''
@@ -66,7 +70,13 @@ export function NavSearch() {
   const hint = isMac ? '⌘K' : 'Ctrl K'
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) setQuery('')
+        setOpen(next)
+      }}
+    >
       <PopoverTrigger asChild>
         <button
           aria-label="Search Pokémon"
@@ -82,7 +92,13 @@ export function NavSearch() {
           </span>
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-72 p-0">
+      <PopoverContent
+        className="w-72 p-0"
+        onOpenAutoFocus={(e) => {
+          e.preventDefault()
+          inputRef.current?.focus()
+        }}
+      >
         <div className="border-b border-border px-3 py-2">
           <input
             ref={inputRef}
@@ -92,12 +108,14 @@ export function NavSearch() {
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </div>
-        <ul className="max-h-64 overflow-y-auto py-1" role="listbox">
-          {filtered.length === 0 ? (
+        <ul className="max-h-64 overflow-y-auto py-1" role="menu">
+          {loading ? (
+            <li className="px-3 py-2 text-sm text-muted-foreground">Loading…</li>
+          ) : filtered.length === 0 ? (
             <li className="px-3 py-2 text-sm text-muted-foreground">No results</li>
           ) : (
             filtered.map((p) => (
-              <li key={p.id} role="option">
+              <li key={p.id} role="menuitem">
                 <button
                   className="w-full flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
                   onClick={() => handleSelect(p.id)}
