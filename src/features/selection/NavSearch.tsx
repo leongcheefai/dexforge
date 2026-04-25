@@ -30,7 +30,9 @@ export function NavSearch() {
   const [items, setItems] = useState<PokemonNameEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
+  const listRef = useRef<HTMLUListElement>(null)
   const { setFromId, setToId } = useSelectionStore()
 
   useEffect(() => {
@@ -54,6 +56,8 @@ export function NavSearch() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
+  useEffect(() => { setActiveIndex(-1) }, [query])
+
   const q = query.trim().toLowerCase()
   const filtered =
     q === ''
@@ -70,6 +74,31 @@ export function NavSearch() {
     setFromId(id)
     setToId(id)
     setOpen(false)
+  }
+
+  function handleInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      const next = Math.min(activeIndex + 1, filtered.length - 1)
+      setActiveIndex(next)
+      scrollItemIntoView(next)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      const next = Math.max(activeIndex - 1, -1)
+      setActiveIndex(next)
+      if (next >= 0) scrollItemIntoView(next)
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault()
+      handleSelect(filtered[activeIndex].id)
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      setOpen(false)
+    }
+  }
+
+  function scrollItemIntoView(index: number) {
+    const item = listRef.current?.children[index] as HTMLElement | undefined
+    item?.scrollIntoView({ block: 'nearest' })
   }
 
   const hint = isMac ? '⌘K' : 'Ctrl K'
@@ -106,23 +135,30 @@ export function NavSearch() {
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleInputKeyDown}
             placeholder="Search by name or number…"
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            aria-activedescendant={activeIndex >= 0 ? `navsearch-item-${activeIndex}` : undefined}
           />
         </div>
-        <ul className="max-h-64 overflow-y-auto py-1" role="menu">
+        <ul ref={listRef} className="max-h-64 overflow-y-auto py-1" role="listbox">
           {loading ? (
-            <li className="px-3 py-2 text-sm text-muted-foreground">Loading…</li>
+            <li role="option" aria-disabled className="px-3 py-2 text-sm text-muted-foreground">Loading…</li>
           ) : error ? (
-            <li className="px-3 py-2 text-sm text-muted-foreground">Failed to load — check your connection</li>
+            <li role="option" aria-disabled className="px-3 py-2 text-sm text-muted-foreground">Failed to load — check your connection</li>
           ) : filtered.length === 0 ? (
-            <li className="px-3 py-2 text-sm text-muted-foreground">No results</li>
+            <li role="option" aria-disabled className="px-3 py-2 text-sm text-muted-foreground">No results</li>
           ) : (
-            filtered.map((p) => (
-              <li key={p.id} role="menuitem">
+            filtered.map((p, i) => (
+              <li key={p.id} id={`navsearch-item-${i}`} role="option" aria-selected={i === activeIndex}>
                 <button
-                  className="w-full flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none"
+                  className={`w-full flex items-center gap-2 px-3 py-1.5 text-sm focus:outline-none ${
+                    i === activeIndex
+                      ? 'bg-accent text-accent-foreground'
+                      : 'hover:bg-accent hover:text-accent-foreground'
+                  }`}
                   onClick={() => handleSelect(p.id)}
+                  onMouseEnter={() => setActiveIndex(i)}
                 >
                   <span
                     className="text-muted-foreground text-xs w-10 shrink-0"
